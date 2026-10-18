@@ -1,10 +1,23 @@
 from pathlib import Path
 
+import pytest
+
+from lib.clients.stremio.protocol import is_safe_http_url
 from lib.clients.subtitle import opensubstremio, submanager
 from lib.clients.subtitle.opensubstremio import OpenSubtitleStremioClient
 from lib.domain.torrent import TorrentStream
 from lib.gui.base_window import BaseWindow
 from lib.utils.general.utils import IndexerType
+
+
+@pytest.fixture(autouse=True)
+def _skip_dns_resolution(monkeypatch):
+    """Validate addon URLs without DNS so the tests run offline."""
+    monkeypatch.setattr(
+        opensubstremio,
+        "is_safe_http_url",
+        lambda url: is_safe_http_url(url, resolve_dns=False),
+    )
 
 
 class _DummyWindow(BaseWindow):
