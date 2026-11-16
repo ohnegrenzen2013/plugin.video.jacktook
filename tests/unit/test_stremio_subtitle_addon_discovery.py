@@ -14,6 +14,20 @@ import threading
 
 import pytest
 
+
+@pytest.fixture(autouse=True)
+def _skip_dns_resolution(monkeypatch):
+    """Validate addon URLs without DNS so the tests run offline."""
+    from lib.clients.stremio.protocol import is_safe_http_url
+    from lib.clients.subtitle import opensubstremio
+
+    monkeypatch.setattr(
+        opensubstremio,
+        "is_safe_http_url",
+        lambda url: is_safe_http_url(url, resolve_dns=False),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
